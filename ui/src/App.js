@@ -7,7 +7,9 @@ import MoviesList from "./MoviesList";
 
 function App() {
     const [movies, setMovies] = useState([]);
+    const [actors, setActors] = useState([]);
     const [addingMovie, setAddingMovie] = useState(false);
+    const [addingActor, setAddingActors] = useState(false);
 
    async function handleAddMovie(movie) {
     const response = await fetch('/movies', {
@@ -32,6 +34,18 @@ function App() {
         }
     }
 
+    async function handleAddActor(actor) {
+        const response = await fetch('/actors', {
+            method: 'POST',
+            body: JSON.stringify(actor),
+            headers: { 'Content-Type': 'application/json' }
+        });
+        if (response.ok) {
+            const actorsFromServer = await response.json()
+            setMovies([...actors, actorsFromServer]);
+            setAddingMovie(false);
+            }
+    }
     useEffect(() => {
         const fetchMovies = async () => {
             const response = await fetch(`/movies`);
@@ -39,7 +53,6 @@ function App() {
                 const movies = await response.json();
                 setMovies(movies);
             }
-    
         };
         fetchMovies();  
     }, []);
@@ -54,6 +67,11 @@ function App() {
                              
                 />}
             {addingMovie
+                ? <MovieForm onMovieSubmit={handleAddMovie}
+                             buttonLabel="Add a movie"
+                />
+                : <button onClick={() => setAddingMovie(true)}>Add a movie</button>}
+            {addingActor
                 ? <MovieForm onMovieSubmit={handleAddMovie}
                              buttonLabel="Add a movie"
                 />
