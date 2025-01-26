@@ -4,12 +4,13 @@ import { useEffect } from 'react';
 import "milligram";
 import MovieForm from "./MovieForm";
 import MoviesList from "./MoviesList";
+import ActorForm from './ActorForm';
 
 function App() {
     const [movies, setMovies] = useState([]);
     const [actors, setActors] = useState([]);
     const [addingMovie, setAddingMovie] = useState(false);
-    const [addingActor, setAddingActors] = useState(false);
+    const [addingActor, setAddingActor] = useState(false);
 
    async function handleAddMovie(movie) {
     const response = await fetch('/movies', {
@@ -34,7 +35,7 @@ function App() {
         }
     }
 
-    async function handleAddActor(actor) {
+    async function handleAddActors(actor) {
         const response = await fetch('/actors', {
             method: 'POST',
             body: JSON.stringify(actor),
@@ -42,8 +43,8 @@ function App() {
         });
         if (response.ok) {
             const actorsFromServer = await response.json()
-            setMovies([...actors, actorsFromServer]);
-            setAddingMovie(false);
+            setActors([...actors, actorsFromServer]);
+            setAddingActor(false);
             }
     }
     useEffect(() => {
@@ -72,10 +73,10 @@ function App() {
                 />
                 : <button onClick={() => setAddingMovie(true)}>Add a movie</button>}
             {addingActor
-                ? <MovieForm onMovieSubmit={handleAddMovie}
+                ? <ActorForm onActorSubmit={handleAddActors}
                              buttonLabel="Add a movie"
                 />
-                : <button onClick={() => setAddingMovie(true)}>Add a movie</button>}
+                : <button onClick={() => setAddingActor(true)}>Add a movie</button>}
         </div>
     );
 }
