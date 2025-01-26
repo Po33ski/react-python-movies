@@ -1,5 +1,6 @@
 import './App.css';
 import {useState} from "react";
+import { useEffect } from 'react';
 import "milligram";
 import MovieForm from "./MovieForm";
 import MoviesList from "./MoviesList";
@@ -20,13 +21,36 @@ function App() {
         }
     }
 
+    async function handleDeleteMovie(movie) {
+        const response = await fetch(`/movies/${movie.id}`, {
+            method: 'DELETE',
+        });
+        if (response.ok) {
+            const nextMovies = movies.filter(m => m !== movie);
+            setMovies(nextMovies);
+        }
+    }
+
+    useEffect(() => {
+        const fetchMovies = async () => {
+            const response = await fetch(`/movies`);
+            if (response.ok) {
+                const movies = await response.json();
+                setMovies(movies);
+            }
+    
+        };
+        fetchMovies();  
+    }, []);
+
     return (
         <div className="container">
             <h1>My favourite movies to watch</h1>
             {movies.length === 0
                 ? <p>No movies yet. Maybe add something?</p>
                 : <MoviesList movies={movies}
-                              onDeleteMovie={(movie) => setMovies(movies.filter(m => m !== movie))}
+                              onDeleteMovie={handleDeleteMovie}
+                             
                 />}
             {addingMovie
                 ? <MovieForm onMovieSubmit={handleAddMovie}
@@ -38,3 +62,6 @@ function App() {
 }
 
 export default App;
+
+
+/*  onDeleteMovie={(movie) => setMovies(movies.filter(m => m !== movie))} */
