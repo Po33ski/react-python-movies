@@ -9,7 +9,7 @@ export default function ActorForm(props) {
         if (name.length < 2) {
             return alert('Imie jest za krotkie');
         }
-        props.onMovieSubmit({name, surname});
+        props.onActorSubmit({name, surname});
         setName('');
         setSurname('');
 
@@ -25,7 +25,6 @@ export default function ActorForm(props) {
             <label>Surname</label>
             <input type="text" value={surname} onChange={(event) => setSurname(event.target.value)}/>
         </div>
-
         <button>{props.buttonLabel || 'Submit'}</button>
     </form>;
 }
