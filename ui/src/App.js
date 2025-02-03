@@ -12,6 +12,7 @@ function App() {
     const [actors, setActors] = useState([]);
     const [addingMovie, setAddingMovie] = useState(false);
     const [addingActor, setAddingActor] = useState(false);
+    const [addingMovieToActor, setAddingMovieToActor] =useState(false)
 
    async function handleAddMovie(movie) {
     const response = await fetch('/movies', {
@@ -68,8 +69,8 @@ function App() {
         if (response.ok) {
             const updatedMovie = await response.json()
             setMovies(prevMovies =>
-            prevMovies.map(m => m.id === movie_id ? updatedMovie : m)
-        );
+            prevMovies.map(m => m.id === movie_id ? updatedMovie : m));
+            setAddingMovieToActor(false)
         } else {
             console.error("Failed to add actor to movie")
         }
@@ -124,15 +125,17 @@ function App() {
                              buttonLabel="Add an Actor"
                 />
                 : <button onClick={() => setAddingActor(true)}>Add an Actor</button>}
-            {(actors.length === 0 || movies.length === 0)
+            {addingMovieToActor
+                ? (actors.length === 0 || movies.length === 0)
                 ? <p>You should add something</p>
                 : <AddActorToMovieForm onAddATMFSubmit={handleAddActorToMovie}
                                        buttonLabel="Add"
                                        movies={movies}
                                        actors={actors}
-                />
-            }
+                    />
 
+                : <button onClick={() => setAddingMovieToActor(true)}>Add Actors to Movies</button>
+            }
 
         </div>
     );
@@ -141,4 +144,3 @@ function App() {
 export default App;
 
 
-/*  onDeleteMovie={(movie) => setMovies(movies.filter(m => m !== movie))} */
