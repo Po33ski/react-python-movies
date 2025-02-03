@@ -27,23 +27,23 @@ class Actor(ActorBase):
         orm_mode = True
         getter_dict = PeeweeGetterDict
 
+
 class MovieBase(BaseModel):
     title: str
     year: int
     director: str
     description: Union[str, None] = None
 
-
 class MovieCreate(MovieBase):
     pass
 
+class ActorToMovie(BaseModel):
+    actor_id: int
 
 class Movie(MovieBase):
     id: int
-    actors: List[Actor] = []
+    actors: List[Actor]
 
     class Config:
         orm_mode = True
         getter_dict = PeeweeGetterDict
-
-

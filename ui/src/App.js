@@ -6,7 +6,7 @@ import MovieForm from "./MovieForm";
 import MoviesList from "./MoviesList";
 import ActorForm from './ActorForm';
 import ActorsList from './ActorsList'
-
+import AddActorToMovieForm from './AddActorToMovieForm'
 function App() {
     const [movies, setMovies] = useState([]);
     const [actors, setActors] = useState([]);
@@ -54,21 +54,21 @@ function App() {
             method: 'DELETE',
         });
         if (response.ok) {
-            const nextActor = actors.filter(m => m !== actor);
+            const nextActor = actors.filter(a => a.id !== actor.id);
             setActors(nextActor);
         }
     }
 
-    async function handleAddActorToMovie(movie, actor) {
-        const response = await fetch(`/movies/${movie}/actors`, {
+    async function handleAddActorToMovie(movie_id, actor_id) {
+        const response = await fetch(`/movies/${movie_id}/actors`, {
             method: 'POST',
-            body: JSON.stringify({actor_id: actor.id}),
+            body: JSON.stringify({actor_id}),
             headers: { 'Content-Type': 'application/json' }
         });
         if (response.ok) {
             const updatedMovie = await response.json()
             setMovies(prevMovies =>
-            prevMovies.map(m => m.id === movie ? updatedMovie : m)
+            prevMovies.map(m => m.id === movie_id ? updatedMovie : m)
         );
         } else {
             console.error("Failed to add actor to movie")
@@ -124,6 +124,16 @@ function App() {
                              buttonLabel="Add an Actor"
                 />
                 : <button onClick={() => setAddingActor(true)}>Add an Actor</button>}
+            {(actors.length === 0 || movies.length === 0)
+                ? <p>You should add something</p>
+                : <AddActorToMovieForm onAddATMFSubmit={handleAddActorToMovie}
+                                       buttonLabel="Add"
+                                       movies={movies}
+                                       actors={actors}
+                />
+            }
+
+
         </div>
     );
 }
