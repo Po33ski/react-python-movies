@@ -26,7 +26,7 @@ function App() {
 
    async function handleAddMovie(movie) {
        try {
-        const response = await fetch('/movies', {
+        const response = await fetch('/movies/', {
             method: 'POST',
             body: JSON.stringify(movie),
             headers: { 'Content-Type': 'application/json' }
@@ -106,7 +106,7 @@ function App() {
     useEffect(() => {
         const fetchMovies = async () => {
             try {
-            const response = await fetch(`/movies`);
+            const response = await fetch(`/movies/`);
             if (!response.ok) throw new Error ("Failed to download the movies");
                 const movies = await response.json();
                 setMovies(movies);

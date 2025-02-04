@@ -1,19 +1,17 @@
 from fastapi import FastAPI, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from typing import List
 
 import models
 import schemas
 
 app = FastAPI()
+app.mount("/static", StaticFiles(directory="../ui/build/static", check_dir=False), name="static")
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+@app.get("/")
+def serve_react_app():
+    return FileResponse("../ui/build/index.html")
 #movies methods:
 @app.get("/movies/", response_model=List[schemas.Movie])
 def get_movies():
@@ -40,7 +38,7 @@ def delete_movie(movie_id: int):
     return movie
 
 #actors methods:
-@app.get("/actors", response_model=List[schemas.Actor])
+@app.get("/actors/", response_model=List[schemas.Actor])
 def get_actors():
     return list(models.Actor.select())
 
