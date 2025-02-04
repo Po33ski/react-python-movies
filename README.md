@@ -1,0 +1,1 @@
+This is a full-stack application utilizing FastAPI, React, and relational databases. It allows users to add and remove movies and actors, as well as assign actors to movies. I developed it using the Peewee and Pydantic libraries. Additionally, the application includes error handling. This project is part of my university coursework.
