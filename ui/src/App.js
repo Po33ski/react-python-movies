@@ -99,7 +99,7 @@ function App() {
         };
         fetchMovies();
         fetchActors()
-    }, []);
+    }, [addingMovieToActor]);
 
     return (
         <div className="container">
@@ -125,7 +125,8 @@ function App() {
                              buttonLabel="Add an Actor"
                 />
                 : <button onClick={() => setAddingActor(true)}>Add an Actor</button>}
-            {addingMovieToActor
+            <div>
+                {addingMovieToActor
                 ? (actors.length === 0 || movies.length === 0)
                 ? <p>You should add something</p>
                 : <AddActorToMovieForm onAddATMFSubmit={handleAddActorToMovie}
@@ -133,10 +134,9 @@ function App() {
                                        movies={movies}
                                        actors={actors}
                     />
-
                 : <button onClick={() => setAddingMovieToActor(true)}>Add Actors to Movies</button>
             }
-
+            </div>
         </div>
     );
 }
