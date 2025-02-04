@@ -1,43 +1,60 @@
 import './App.css';
-import {useState} from "react";
-import { useEffect } from 'react';
+import {useState, useEffect, useCallback} from "react";
 import "milligram";
 import MovieForm from "./MovieForm";
 import MoviesList from "./MoviesList";
 import ActorForm from './ActorForm';
 import ActorsList from './ActorsList'
 import AddActorToMovieForm from './AddActorToMovieForm'
+import { ErrorMessage } from './ErrorMessage'
+
 function App() {
     const [movies, setMovies] = useState([]);
     const [actors, setActors] = useState([]);
     const [addingMovie, setAddingMovie] = useState(false);
     const [addingActor, setAddingActor] = useState(false);
-    const [addingMovieToActor, setAddingMovieToActor] =useState(false)
+    const [addingMovieToActor, setAddingMovieToActor] = useState(false)
+    const [errorMessage, setErrorMessage] = useState(null);
+
+
+  const handleError = useCallback((message) => {
+    setErrorMessage(message);
+    setTimeout(() => {
+      setErrorMessage(null);
+    }, 5000);
+  }, []);
 
    async function handleAddMovie(movie) {
-    const response = await fetch('/movies', {
-        method: 'POST',
-        body: JSON.stringify(movie),
-        headers: { 'Content-Type': 'application/json' }
-    });
-    if (response.ok) {
-        const movieFromServer = await response.json()
-        setMovies([...movies, movieFromServer]);
-        setAddingMovie(false);
-        }
-    }
+       try {
+        const response = await fetch('/movies', {
+            method: 'POST',
+            body: JSON.stringify(movie),
+            headers: { 'Content-Type': 'application/json' }
+        });
+            if (!response.ok) throw new Error("Failed to add movie");
+            const movieFromServer = await response.json()
+            setMovies([...movies, movieFromServer]);
+            setAddingMovie(false);
+             } catch (error) {
+              handleError(error.message);
+           }
+   }
 
     async function handleDeleteMovie(movie) {
+       try {
         const response = await fetch(`/movies/${movie.id}`, {
             method: 'DELETE',
         });
-        if (response.ok) {
+        if (!response.ok) throw new Error("Failed to delete movie");
             const nextMovies = movies.filter(m => m.id !== movie.id);
             setMovies(nextMovies);
-        }
+        } catch(error){
+            handleError(error.message);
+       }
     }
 
     async function handleAddActors(actor) {
+       try{
         const response = await fetch('/actors/', {
             method: 'POST',
             body: JSON.stringify(actor),
@@ -48,9 +65,14 @@ function App() {
             setActors([...actors, actorFromServer]);
             setAddingActor(false);
             }
+        else throw new Error("Failed to add actor");
+       }catch(error){
+            handleError(error.message);
+       }
     }
 
     async function handleDeleteActor(actor) {
+       try{
         const response = await fetch(`/actors/${actor.id}`, {
             method: 'DELETE',
         });
@@ -58,24 +80,29 @@ function App() {
             const nextActor = actors.filter(a => a.id !== actor.id);
             setActors(nextActor);
         }
+       else throw new Error("Failed to delete actor");
+       }catch(error){
+            handleError(error.message);
+       }
     }
 
     async function handleAddActorToMovie(movie_id, actor_id) {
-        const response = await fetch(`/movies/${movie_id}/actors`, {
-            method: 'POST',
-            body: JSON.stringify({actor_id}),
-            headers: { 'Content-Type': 'application/json' }
-        });
-        if (response.ok) {
-            const updatedMovie = await response.json()
-            setMovies(prevMovies =>
-            prevMovies.map(m => m.id === movie_id ? updatedMovie : m));
-            setAddingMovieToActor(false)
-        } else {
-            console.error("Failed to add actor to movie")
-        }
+        try {
+            const response = await fetch(`/movies/${movie_id}/actors`, {
+                method: 'POST',
+                body: JSON.stringify({actor_id}),
+                headers: {'Content-Type': 'application/json'}
+            });
+            if (response.ok) {
+                const updatedMovie = await response.json()
+                setMovies(prevMovies =>
+                    prevMovies.map(m => m.id === movie_id ? updatedMovie : m));
+                setAddingMovieToActor(false)
+            } else throw new Error("Failed to add actor to movie");
+        }catch(error){
+            handleError(error.message);
+       }
     }
-
     useEffect(() => {
         const fetchMovies = async () => {
             try {
@@ -85,6 +112,7 @@ function App() {
                 setMovies(movies);
             } catch (error){
                 console.error(error)
+                handleError(error.message);
             }
         };
         const fetchActors = async () => {
@@ -95,13 +123,17 @@ function App() {
                 setActors(actors);
             } catch (error){
                 console.error(error)
+                handleError(error.message);
             }
         };
         fetchMovies();
         fetchActors()
     }, [addingMovieToActor]);
 
+
     return (
+        <>
+            {errorMessage && <ErrorMessage>{errorMessage}</ErrorMessage>}
         <div className="container">
             <h1>My favourite movies to watch</h1>
             {movies.length === 0
@@ -138,6 +170,7 @@ function App() {
             }
             </div>
         </div>
+        </>
     );
 }
 
